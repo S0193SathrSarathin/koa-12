@@ -1,0 +1,838 @@
+<!DOCTYPE html>
+<html lang="th">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>แบบทดสอบภาษาอังกฤษ Midterm</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Inter", sans-serif;
+        background-color: #f0f4f8;
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+        min-height: 100vh;
+        padding: 20px;
+        box-sizing: border-box;
+      }
+      .quiz-container {
+        background-color: #ffffff;
+        border-radius: 16px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        padding: 30px;
+        width: 100%;
+        max-width: 700px;
+        text-align: center;
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+      }
+      .question-text {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: #334155;
+        margin-bottom: 20px;
+        line-height: 1.5;
+      }
+      .options-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 12px;
+        margin-bottom: 20px;
+      }
+      .option-button {
+        background-color: #e2e8f0;
+        color: #475569;
+        padding: 14px 20px;
+        border-radius: 10px;
+        font-size: 1rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s ease-in-out;
+        text-align: left;
+        border: 2px solid transparent;
+      }
+      .option-button:hover:not(:disabled) {
+        background-color: #cbd5e1;
+        color: #1e293b;
+      }
+      .option-button.selected {
+        background-color: #93c5fd; /* blue-300 */
+        color: #1e3a8a; /* blue-900 */
+        border-color: #3b82f6; /* blue-500 */
+      }
+      .option-button.correct {
+        background-color: #a7f3d0; /* green-200 */
+        color: #065f46; /* green-800 */
+        border-color: #10b981; /* green-500 */
+      }
+      .option-button.incorrect {
+        background-color: #fecaca; /* red-200 */
+        color: #991b1b; /* red-800 */
+        border-color: #ef4444; /* red-500 */
+      }
+      .option-button:disabled {
+        cursor: not-allowed;
+        opacity: 0.8;
+      }
+      .navigation-buttons {
+        display: flex;
+        justify-content: space-between;
+        gap: 15px;
+        margin-top: 20px;
+      }
+      .nav-button,
+      .submit-button,
+      .retry-button,
+      .confirm-button {
+        padding: 12px 25px;
+        border-radius: 10px;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s ease-in-out;
+        flex-grow: 1;
+      }
+      .nav-button {
+        background-color: #64748b; /* slate-500 */
+        color: #ffffff;
+      }
+      .nav-button:hover:not(:disabled) {
+        background-color: #475569; /* slate-600 */
+      }
+      .nav-button:disabled {
+        background-color: #cbd5e1; /* slate-300 */
+        cursor: not-allowed;
+      }
+      .confirm-button {
+        background-color: #f97316; /* orange-500 */
+        color: #ffffff;
+      }
+      .confirm-button:hover:not(:disabled) {
+        background-color: #ea580c; /* orange-600 */
+      }
+      .confirm-button:disabled {
+        background-color: #fed7aa; /* orange-200 */
+        cursor: not-allowed;
+      }
+      .submit-button {
+        background-color: #10b981; /* emerald-500 */
+        color: #ffffff;
+      }
+      .submit-button:hover {
+        background-color: #059669; /* emerald-600 */
+      }
+      .retry-button {
+        background-color: #3b82f6; /* blue-500 */
+        color: #ffffff;
+      }
+      .retry-button:hover {
+        background-color: #2563eb; /* blue-600 */
+      }
+      .results-container {
+        margin-top: 20px;
+        padding: 20px;
+        background-color: #f8fafc;
+        border-radius: 10px;
+        border: 1px solid #e2e8f0;
+      }
+      .score-text {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #1e293b;
+        margin-bottom: 10px;
+      }
+      .pass-fail-text {
+        font-size: 1.2rem;
+        font-weight: 600;
+        margin-bottom: 15px;
+      }
+      .pass-fail-text.pass {
+        color: #10b981; /* emerald-500 */
+      }
+      .pass-fail-text.fail {
+        color: #ef4444; /* red-500 */
+      }
+      .progress-bar-container {
+        width: 100%;
+        background-color: #e2e8f0;
+        border-radius: 5px;
+        height: 10px;
+        margin-bottom: 20px;
+        overflow: hidden;
+      }
+      .progress-bar {
+        height: 100%;
+        background-color: #3b82f6; /* blue-500 */
+        width: 0%;
+        border-radius: 5px;
+        transition: width 0.3s ease-in-out;
+      }
+      .question-counter {
+        font-size: 0.9rem;
+        color: #64748b;
+        margin-bottom: 10px;
+      }
+      @media (min-width: 640px) {
+        .options-grid {
+          grid-template-columns: 1fr 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="quiz-container">
+      <h1 class="text-3xl font-bold text-slate-800 mb-4">
+        แบบทดสอบภาษาอังกฤษ Midterm
+      </h1>
+      <div class="progress-bar-container">
+        <div id="progressBar" class="progress-bar"></div>
+      </div>
+      <div id="questionCounter" class="question-counter"></div>
+      <div id="quizContent">
+        <p id="questionText" class="question-text"></p>
+        <div id="optionsContainer" class="options-grid">
+          <!-- Options will be loaded here by JavaScript -->
+        </div>
+        <div class="navigation-buttons">
+          <button id="prevButton" class="nav-button">ก่อนหน้า</button>
+          <button id="confirmButton" class="confirm-button hidden">
+            ยืนยันคำตอบ
+          </button>
+          <button id="nextButton" class="nav-button">ถัดไป</button>
+        </div>
+        <button id="submitButton" class="submit-button mt-4 hidden">
+          ส่งคำตอบทั้งหมด
+        </button>
+      </div>
+      <div id="results" class="results-container hidden">
+        <p class="score-text">
+          คะแนนของคุณ: <span id="finalScore"></span> / 40
+        </p>
+        <p class="pass-fail-text" id="passFailStatus"></p>
+        <button id="retryButton" class="retry-button">ทำอีกครั้ง</button>
+      </div>
+    </div>
+
+    <script>
+      // Original questions data
+      const originalQuestions = [
+        // Unit 1: Relative Clauses
+        {
+          question: "The woman ______ lives next door is a famous author.",
+          options: ["whose", "whom", "who", "which"],
+          correctAnswerIndex: 2,
+          topic: "Relative Clause",
+        },
+        {
+          question: "This is the book ______ I told you about yesterday.",
+          options: ["who", "whom", "whose", "which"],
+          correctAnswerIndex: 3,
+          topic: "Relative Clause",
+        },
+        {
+          question: "I visited the town ______ my grandparents were born.",
+          options: ["when", "who", "where", "which"],
+          correctAnswerIndex: 2,
+          topic: "Relative Clause",
+        },
+        {
+          question: "Do you know the reason ______ she left so early?",
+          options: ["where", "when", "why", "who"],
+          correctAnswerIndex: 2,
+          topic: "Relative Clause",
+        },
+        {
+          question: "He's the student ______ parents are both teachers.",
+          options: ["who", "whom", "whose", "which"],
+          correctAnswerIndex: 2,
+          topic: "Relative Clause",
+        },
+        {
+          question: "The day ______ we met was unforgettable.",
+          options: ["where", "when", "who", "which"],
+          correctAnswerIndex: 1,
+          topic: "Relative Clause",
+        },
+        {
+          question:
+            "She showed me the painting ______ she bought at the auction.",
+          options: ["who", "whom", "whose", "which"],
+          correctAnswerIndex: 3,
+          topic: "Relative Clause",
+        },
+        {
+          question: "The man ______ I saw at the party was very tall.",
+          options: ["who", "whom", "whose", "which"],
+          correctAnswerIndex: 1, // 'whom' is grammatically correct as object, though 'who' is common informally. Sticking to formal 'whom' for exam context. 'that' is also an option but not provided.
+          topic: "Relative Clause",
+        },
+        {
+          question: "I don't like people ______ complain all the time.",
+          options: ["whose", "whom", "who", "where"],
+          correctAnswerIndex: 2,
+          topic: "Relative Clause",
+        },
+        {
+          question: "The restaurant ______ we had dinner was excellent.",
+          options: ["when", "which", "where", "who"],
+          correctAnswerIndex: 2,
+          topic: "Relative Clause",
+        },
+        // Unit 1: Present Perfect
+        {
+          question: "I ______ in this city for ten years.",
+          options: ["live", "am living", "have lived", "lived"],
+          correctAnswerIndex: 2,
+          topic: "Present Perfect",
+        },
+        {
+          question: "She ______ her homework already.",
+          options: ["finish", "finished", "has finished", "is finishing"],
+          correctAnswerIndex: 2,
+          topic: "Present Perfect",
+        },
+        {
+          question: "They ______ never ______ sushi before.",
+          options: [
+            "have / eaten",
+            "had / eaten",
+            "are / eating",
+            "were / eating",
+          ],
+          correctAnswerIndex: 0,
+          topic: "Present Perfect",
+        },
+        {
+          question: "______ you ever ______ to Paris?",
+          options: ["Did / go", "Have / been", "Are / going", "Had / gone"],
+          correctAnswerIndex: 1,
+          topic: "Present Perfect",
+        },
+        {
+          question: "We ______ just ______ the news.",
+          options: [
+            "have / heard",
+            "had / heard",
+            "are / hearing",
+            "were / hearing",
+          ],
+          correctAnswerIndex: 0,
+          topic: "Present Perfect",
+        },
+        {
+          question: "He ______ not ______ that movie yet.",
+          options: ["has / seen", "had / seen", "is / seeing", "did / see"],
+          correctAnswerIndex: 0,
+          topic: "Present Perfect",
+        },
+        {
+          question: "How long ______ you ______ English?",
+          options: [
+            "did / study",
+            "have / studied",
+            "are / studying",
+            "had / studied",
+          ],
+          correctAnswerIndex: 1,
+          topic: "Present Perfect",
+        },
+        {
+          question: "My sister ______ three books this month.",
+          options: ["writes", "wrote", "has written", "is writing"],
+          correctAnswerIndex: 2,
+          topic: "Present Perfect",
+        },
+        {
+          question: "The company ______ a lot of progress recently.",
+          options: ["makes", "made", "has made", "is making"],
+          correctAnswerIndex: 2,
+          topic: "Present Perfect",
+        },
+        {
+          question: "I'm sorry, I ______ your name.",
+          options: ["forget", "forgot", "have forgotten", "am forgetting"],
+          correctAnswerIndex: 2,
+          topic: "Present Perfect",
+        },
+        // Unit 2: Past Perfect
+        {
+          question: "By the time we arrived, the show ______.",
+          options: ["starts", "started", "had started", "was starting"],
+          correctAnswerIndex: 2,
+          topic: "Past Perfect",
+        },
+        {
+          question: "She realized she ______ her wallet at home.",
+          options: ["leaves", "left", "had left", "was leaving"],
+          correctAnswerIndex: 2,
+          topic: "Past Perfect",
+        },
+        {
+          question: "After they ______ dinner, they went for a walk.",
+          options: ["eat", "ate", "had eaten", "were eating"],
+          correctAnswerIndex: 2,
+          topic: "Past Perfect",
+        },
+        {
+          question:
+            "He couldn't get into his house because he ______ his keys.",
+          options: ["loses", "lost", "had lost", "was losing"],
+          correctAnswerIndex: 2,
+          topic: "Past Perfect",
+        },
+        {
+          question: "The patient ______ before the doctor arrived.",
+          options: ["dies", "died", "had died", "was dying"],
+          correctAnswerIndex: 2,
+          topic: "Past Perfect",
+        },
+        {
+          question: "I knew the city well because I ______ there before.",
+          options: ["go", "went", "had gone", "was going"],
+          correctAnswerIndex: 2,
+          topic: "Past Perfect",
+        },
+        {
+          question: "She was tired because she ______ all day.",
+          options: ["works", "worked", "had worked", "was working"],
+          correctAnswerIndex: 2,
+          topic: "Past Perfect",
+        },
+        {
+          question:
+            "They ______ never ______ such a beautiful place until then.",
+          options: [
+            "have / seen",
+            "had / seen",
+            "are / seeing",
+            "were / seeing",
+          ],
+          correctAnswerIndex: 1,
+          topic: "Past Perfect",
+        },
+        {
+          question: "By midnight, I ______ all the chapters.",
+          options: ["read", "am reading", "had read", "was reading"],
+          correctAnswerIndex: 2,
+          topic: "Past Perfect",
+        },
+        {
+          question: "We couldn't buy tickets because they ______ all ______.",
+          options: [
+            "have / sold",
+            "had / sold",
+            "are / selling",
+            "were / selling",
+          ],
+          correctAnswerIndex: 1,
+          topic: "Past Perfect",
+        },
+        // Unit 2: Past Perfect Continuous
+        {
+          question: "He was exhausted because he ______ for hours.",
+          options: [
+            "has been running",
+            "had been running",
+            "was running",
+            "ran",
+          ],
+          correctAnswerIndex: 1,
+          topic: "Past Perfect Continuous",
+        },
+        {
+          question: "Her eyes were red because she ______.",
+          options: ["cries", "cried", "had been crying", "was crying"],
+          correctAnswerIndex: 2,
+          topic: "Past Perfect Continuous",
+        },
+        {
+          question: "They ______ for three hours when the storm started.",
+          options: [
+            "have been driving",
+            "had been driving",
+            "were driving",
+            "drove",
+          ],
+          correctAnswerIndex: 1,
+          topic: "Past Perfect Continuous",
+        },
+        {
+          question: "I felt much better after I ______ for a while.",
+          options: [
+            "had been resting",
+            "have been resting",
+            "was resting",
+            "rested",
+          ],
+          correctAnswerIndex: 0,
+          topic: "Past Perfect Continuous",
+        },
+        {
+          question: "The garden was wet because it ______ all night.",
+          options: [
+            "has been raining",
+            "had been raining",
+            "was raining",
+            "rained",
+          ],
+          correctAnswerIndex: 1,
+          topic: "Past Perfect Continuous",
+        },
+        {
+          question: "She finally found the book she ______ for weeks.",
+          options: [
+            "has been looking",
+            "had been looking",
+            "was looking",
+            "looked",
+          ],
+          correctAnswerIndex: 1,
+          topic: "Past Perfect Continuous",
+        },
+        {
+          question: "He failed the exam because he ______ enough.",
+          options: [
+            "hasn't been studying",
+            "hadn't been studying",
+            "wasn't studying",
+            "didn't study",
+          ],
+          correctAnswerIndex: 1,
+          topic: "Past Perfect Continuous",
+        },
+        {
+          question:
+            "We were surprised because they ______ about their trip for months.",
+          options: [
+            "have been talking",
+            "had been talking",
+            "were talking",
+            "talked",
+          ],
+          correctAnswerIndex: 1,
+          topic: "Past Perfect Continuous",
+        },
+        {
+          question: "When I saw him, he ______ on the phone for a long time.",
+          options: [
+            "has been talking",
+            "had been talking",
+            "was talking",
+            "talked",
+          ],
+          correctAnswerIndex: 1,
+          topic: "Past Perfect Continuous",
+        },
+        {
+          question: "The road was closed because they ______ it.",
+          options: [
+            "have been repairing",
+            "had been repairing",
+            "were repairing",
+            "repaired",
+          ],
+          correctAnswerIndex: 1,
+          topic: "Past Perfect Continuous",
+        },
+        // Additional questions to reach 40, mixing topics
+        {
+          question:
+            "The artist ______ paintings are displayed here is very famous.",
+          options: ["who", "whom", "whose", "which"],
+          correctAnswerIndex: 2,
+          topic: "Relative Clause",
+        },
+        {
+          question: "I ______ never ______ such a delicious meal.",
+          options: [
+            "have / tasted",
+            "had / tasted",
+            "am / tasting",
+            "was / tasting",
+          ],
+          correctAnswerIndex: 0,
+          topic: "Present Perfect",
+        },
+        {
+          question:
+            "By the time she graduated, she ______ five different countries.",
+          options: ["visits", "visited", "had visited", "was visiting"],
+          correctAnswerIndex: 2,
+          topic: "Past Perfect",
+        },
+        {
+          question: "He was out of breath because he ______ up the stairs.",
+          options: [
+            "has been running",
+            "had been running",
+            "was running",
+            "ran",
+          ],
+          correctAnswerIndex: 1,
+          topic: "Past Perfect Continuous",
+        },
+        {
+          question: "This is the park ______ we used to play as children.",
+          options: ["when", "which", "where", "who"],
+          correctAnswerIndex: 2,
+          topic: "Relative Clause",
+        },
+        {
+          question: "They ______ just ______ their new house.",
+          options: [
+            "have / bought",
+            "had / bought",
+            "are / buying",
+            "were / buying",
+          ],
+          correctAnswerIndex: 0,
+          topic: "Present Perfect",
+        },
+        {
+          question: "She didn't recognize him because he ______ a lot.",
+          options: ["changes", "changed", "had changed", "was changing"],
+          correctAnswerIndex: 2,
+          topic: "Past Perfect",
+        },
+        {
+          question: "The car broke down because I ______ it properly.",
+          options: [
+            "haven't been maintaining",
+            "hadn't been maintaining",
+            "wasn't maintaining",
+            "didn't maintain",
+          ],
+          correctAnswerIndex: 1,
+          topic: "Past Perfect Continuous",
+        },
+        {
+          question: "The movie ______ we watched last night was fantastic.",
+          options: ["who", "whom", "whose", "which"],
+          correctAnswerIndex: 3,
+          topic: "Relative Clause",
+        },
+        {
+          question: "How many times ______ you ______ this book?",
+          options: ["did / read", "have / read", "are / reading", "had / read"],
+          correctAnswerIndex: 1,
+          topic: "Present Perfect",
+        },
+      ];
+
+      let shuffledQuestions = [];
+      let currentQuestionIndex = 0;
+      // userAnswers will store objects: { selectedOptionIndex: null, isCorrect: null, hasBeenConfirmed: false }
+      let userAnswers = [];
+      const passingScore = 28; // 28 correct answers out of 40 questions
+
+      const questionText = document.getElementById("questionText");
+      const optionsContainer = document.getElementById("optionsContainer");
+      const prevButton = document.getElementById("prevButton");
+      const nextButton = document.getElementById("nextButton");
+      const confirmButton = document.getElementById("confirmButton"); // New confirm button
+      const submitButton = document.getElementById("submitButton");
+      const resultsContainer = document.getElementById("results");
+      const finalScoreText = document.getElementById("finalScore");
+      const passFailStatus = document.getElementById("passFailStatus");
+      const retryButton = document.getElementById("retryButton");
+      const progressBar = document.getElementById("progressBar");
+      const questionCounter = document.getElementById("questionCounter");
+      const quizContent = document.getElementById("quizContent");
+
+      // Fisher-Yates (Knuth) shuffle algorithm
+      function shuffleArray(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [array[i], array[j]] = [array[j], array[i]];
+        }
+        return array;
+      }
+
+      function initializeQuiz() {
+        // Shuffle questions and reset user answers
+        shuffledQuestions = shuffleArray([...originalQuestions]); // Create a shallow copy to shuffle
+        userAnswers = shuffledQuestions.map(() => ({
+          selectedOptionIndex: null,
+          isCorrect: null,
+          hasBeenConfirmed: false,
+        }));
+        currentQuestionIndex = 0;
+        resultsContainer.classList.add("hidden");
+        quizContent.classList.remove("hidden");
+        displayQuestion();
+      }
+
+      function updateProgressBar() {
+        const progress =
+          ((currentQuestionIndex + 1) / shuffledQuestions.length) * 100;
+        progressBar.style.width = `${progress}%`;
+      }
+
+      function updateQuestionCounter() {
+        questionCounter.textContent = `คำถามที่ ${
+          currentQuestionIndex + 1
+        } จาก ${shuffledQuestions.length}`;
+      }
+
+      function displayQuestion() {
+        const question = shuffledQuestions[currentQuestionIndex];
+        const userAnswerData = userAnswers[currentQuestionIndex];
+
+        questionText.textContent = question.question;
+        optionsContainer.innerHTML = ""; // Clear previous options
+
+        question.options.forEach((option, index) => {
+          const button = document.createElement("button");
+          button.textContent = option;
+          button.classList.add("option-button");
+          button.onclick = () => selectAnswer(index);
+
+          // Apply selected class if user has chosen this option
+          if (
+            userAnswerData.selectedOptionIndex !== null &&
+            userAnswerData.selectedOptionIndex === index
+          ) {
+            button.classList.add("selected");
+          }
+
+          // If question has been confirmed, show correct/incorrect feedback and disable buttons
+          if (userAnswerData.hasBeenConfirmed) {
+            button.disabled = true; // Disable all options
+            if (index === question.correctAnswerIndex) {
+              button.classList.add("correct");
+            } else if (index === userAnswerData.selectedOptionIndex) {
+              button.classList.add("incorrect");
+            }
+          }
+          optionsContainer.appendChild(button);
+        });
+
+        // Update button states
+        prevButton.disabled = currentQuestionIndex === 0;
+        nextButton.disabled =
+          currentQuestionIndex === shuffledQuestions.length - 1;
+        submitButton.classList.toggle(
+          "hidden",
+          currentQuestionIndex !== shuffledQuestions.length - 1
+        );
+
+        // Manage confirm button visibility and state
+        if (userAnswerData.hasBeenConfirmed) {
+          confirmButton.classList.add("hidden");
+        } else if (userAnswerData.selectedOptionIndex !== null) {
+          confirmButton.classList.remove("hidden");
+          confirmButton.disabled = false;
+        } else {
+          confirmButton.classList.add("hidden");
+          confirmButton.disabled = true;
+        }
+
+        updateProgressBar();
+        updateQuestionCounter();
+      }
+
+      function selectAnswer(selectedIndex) {
+        // Only allow selection if the question hasn't been confirmed yet
+        if (!userAnswers[currentQuestionIndex].hasBeenConfirmed) {
+          userAnswers[currentQuestionIndex].selectedOptionIndex = selectedIndex;
+          // Remove 'selected' class from all options, then add to the clicked one
+          Array.from(optionsContainer.children).forEach((button, index) => {
+            button.classList.remove("selected");
+            if (index === selectedIndex) {
+              button.classList.add("selected");
+            }
+          });
+          // Show confirm button once an option is selected
+          confirmButton.classList.remove("hidden");
+          confirmButton.disabled = false;
+        }
+      }
+
+      function confirmAnswer() {
+        const currentQuestion = shuffledQuestions[currentQuestionIndex];
+        const userAnswerData = userAnswers[currentQuestionIndex];
+
+        if (userAnswerData.selectedOptionIndex === null) {
+          // Should not happen if confirm button is disabled when no selection
+          // but good for robustness
+          return;
+        }
+
+        userAnswerData.hasBeenConfirmed = true;
+        userAnswerData.isCorrect =
+          userAnswerData.selectedOptionIndex ===
+          currentQuestion.correctAnswerIndex;
+
+        // Apply feedback classes and disable buttons
+        Array.from(optionsContainer.children).forEach((button, index) => {
+          button.disabled = true; // Disable all options
+          if (index === currentQuestion.correctAnswerIndex) {
+            button.classList.add("correct");
+          } else if (
+            index === userAnswerData.selectedOptionIndex &&
+            !userAnswerData.isCorrect
+          ) {
+            button.classList.add("incorrect");
+          }
+        });
+
+        confirmButton.classList.add("hidden"); // Hide confirm button after confirmation
+      }
+
+      function navigateQuestion(direction) {
+        if (direction === "prev" && currentQuestionIndex > 0) {
+          currentQuestionIndex--;
+        } else if (
+          direction === "next" &&
+          currentQuestionIndex < shuffledQuestions.length - 1
+        ) {
+          currentQuestionIndex++;
+        }
+        displayQuestion();
+      }
+
+      function calculateFinalScore() {
+        let score = 0;
+        userAnswers.forEach((answer) => {
+          if (answer.isCorrect) {
+            score++;
+          }
+        });
+        return score;
+      }
+
+      function showResults() {
+        const finalScore = calculateFinalScore();
+        quizContent.classList.add("hidden");
+        resultsContainer.classList.remove("hidden");
+        finalScoreText.textContent = finalScore;
+
+        if (finalScore >= passingScore) {
+          passFailStatus.textContent = `คุณผ่าน! ยอดเยี่ยมมาก! คุณทำได้ ${finalScore} ข้อจาก 40 ข้อ`;
+          passFailStatus.classList.remove("fail");
+          passFailStatus.classList.add("pass");
+        } else {
+          passFailStatus.textContent = `คุณไม่ผ่าน. ต้องได้ ${passingScore} ข้อขึ้นไป. คุณทำได้ ${finalScore} ข้อจาก 40 ข้อ ลองพยายามอีกครั้งนะครับ!`;
+          passFailStatus.classList.remove("pass");
+          passFailStatus.classList.add("fail");
+        }
+      }
+
+      // Event Listeners
+      prevButton.addEventListener("click", () => navigateQuestion("prev"));
+      nextButton.addEventListener("click", () => navigateQuestion("next"));
+      confirmButton.addEventListener("click", confirmAnswer); // New event listener for confirm button
+      submitButton.addEventListener("click", showResults);
+      retryButton.addEventListener("click", initializeQuiz);
+
+      // Initialize the quiz on page load
+      initializeQuiz();
+    </script>
+  </body>
+</html>
